@@ -293,7 +293,7 @@ public class DataManager {
 
     public boolean destinationSaveAs(File output, HeaderBuilder headerBuilder) {
         File saved = makeResultFile(headerBuilder.getBytes(), destination);
-        return source.delete() && saved.renameTo(output);
+        return destination.delete() && saved.renameTo(output);
     }
 
     private static class Cache {
