@@ -2,7 +2,7 @@ import compress.CompressMode;
 import compress.disk.DataManager;
 import compress.disk.HeaderBuilder;
 
-import compress.memory.Jungle;
+import compress.memory.Table;
 import helpers.StopWatch;
 
 import java.io.File;
@@ -16,7 +16,7 @@ public class Chop {
     static int round = 0;
     static long bestCompressedSize;
     static DataManager dm;
-    static Jungle jungle;
+    static Table table;
 
     public static void main(String[] args) {
         CompressMode mode;
@@ -114,7 +114,10 @@ public class Chop {
         round++;
         File roundFile = new File(output.getAbsolutePath().concat("^.cR" + round));
         dm = new DataManager(input.getAbsoluteFile(), roundFile);
-        jungle = new Jungle();
+        if (table == null)
+            table = new Table();
+        else
+            table.reset();
 
         if (round == 1) {
             headerBuilder.originalSize = dm.getSourceSize();
@@ -129,7 +132,7 @@ public class Chop {
         long domination = calculateMatrixDomination();
         System.out.println("\u27A5 |Done|");
 
-        System.out.println(jungle.getCultures() + " blocks in memory");
+        System.out.println(table.getCount() + " blocks in memory");
         System.out.println("matrix blocks [" + matrixBlocks + "]");
         System.out.println("domination " + domination);
 
@@ -204,56 +207,25 @@ public class Chop {
     }
 
     static int buildMatrix() {
-        long id;
         while (dm.fetchBlock() == DataManager.compressMode.BLOCK_LEN) {
-            id = dm.getBlockId();
-            Jungle.Tribe tribe = jungle.find(id);
-            if (tribe == null) {
-                jungle.establish(id).oneMovedIn();
-            } else {
-                tribe.oneMovedIn();
-            }
+            table.updateValuePlus(dm.getBlockId());
         }
         dm.rewind();
 
         int mbc = 1 + DataManager.compressMode.BLOCK_LEN;
         mbc /= DataManager.compressMode.BLOCK_LEN - 2;
 
-        Jungle.Territory territory;
-        Jungle.Territory maxTerritory;
         int i;
-
         Arrays.fill(matrix, Constants.NO_BLOCK_ID);
         for (i = 0; i < matrix.length; i++) {
-            territory = jungle.getTerritoriesList();
-            maxTerritory = territory;
-
-            while (maxTerritory != null) {
-                if (!maxTerritory.tribe().flag
-                        &&
-                        maxTerritory.tribe().getInhabitants() >= mbc
-                ) {
-                    break;
-                }
-                maxTerritory = maxTerritory.visitNext();
+            matrix[i] = table.selectIdOfMaxValue(mbc);
+            if (matrix[i] == -404) {
+                matrix[i] = Constants.NO_BLOCK_ID;
+                break;
             }
-            if (maxTerritory == null) break;
-
-            while (territory != null) {
-                if (!territory.tribe().flag
-                        &&
-                        territory.tribe().getInhabitants() >
-                                maxTerritory.tribe().getInhabitants()
-                ) {
-                    maxTerritory = territory;
-                }
-                territory = territory.visitNext();
-            }
-
-            matrix[i] = maxTerritory.tribe().getCulture();
-            maxTerritory.tribe().flag = true;
+            table.updateValueNegative(matrix[i]);
 //            System.out.print("BLK(" + matrix[i] + ")  ");
-//            System.out.println("X" + maxTerritory.tribe().getInhabitants());
+//            System.out.println("X" + table.selectValue(matrix[i]));
         }
         Arrays.sort(matrix);
         return i;
@@ -264,7 +236,7 @@ public class Chop {
         long domination = 0;
         for (long id : matrix) {
             if (id == Constants.NO_BLOCK_ID) continue;
-            domination += jungle.go(id).getInhabitants() * (bl - 2) - bl;
+            domination += table.selectValue(id) * (bl - 2) - bl;
         }
         return domination - 2;
     }
