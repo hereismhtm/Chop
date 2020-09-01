@@ -4,21 +4,21 @@ import java.util.Arrays;
 
 public class Table {
     private final int[] records = new int[16777216];
-    private long count = 0;
 
     public void reset() {
         Arrays.fill(records, 0);
-        count = 0;
     }
 
     public long getCount() {
+        int count = 0;
+        for (int record : records) {
+            if (record != 0) count++;
+        }
         return count;
     }
 
     public void updateValuePlus(long id) {
-        int i = (int) id;
-        records[i]++;
-        if (records[i] == 1) count++;
+        records[(int) id]++;
     }
 
     public void updateValueNegative(long id) {
@@ -33,7 +33,7 @@ public class Table {
         int id = -404;
         int maxValue = 0;
         for (int i = 0; i < records.length; i++) {
-            if (records[i] >= condition && records[i] > maxValue) {
+            if (records[i] > maxValue && records[i] >= condition) {
                 id = i;
                 maxValue = records[i];
             }
