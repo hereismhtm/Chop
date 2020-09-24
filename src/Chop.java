@@ -182,6 +182,7 @@ public class Chop {
                 return compress(roundFile, output);
             }
         } else {
+            System.out.println("diff " + (dm.getDestinationSize() + HeaderBuilder.HEADER_SIZE - nextCompressedSize));
             System.out.println("--> round " + round + " ignored");
             round--;
             return dm.deleteDestination()
