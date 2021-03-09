@@ -27,7 +27,7 @@ public class StopWatch {
     }
 
     // get time in seconds
-    public long getTimeSecs() {
+    public long getTimeSeconds() {
         long time;
         if (running) {
             time = ((System.currentTimeMillis() - startTime) / 1000);
@@ -38,7 +38,7 @@ public class StopWatch {
     }
 
     // get time in minutes
-    public long getTimeMins() {
+    public long getTimeMinutes() {
         long time;
         if (running) {
             time = ((System.currentTimeMillis() - startTime) / 60000);

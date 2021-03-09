@@ -3,10 +3,10 @@ package helpers;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class ShaSum {
+public class Sha160Sum {
     private MessageDigest mesDig;
 
-    public ShaSum() {
+    public Sha160Sum() {
         try {
             mesDig = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {
@@ -15,19 +15,19 @@ public class ShaSum {
         }
     }
 
-    public ShaSum update(byte b) {
+    public Sha160Sum update(byte b) {
         mesDig.update(b);
 
         return this;
     }
 
-    public ShaSum update(byte[] bytes) {
+    public Sha160Sum update(byte[] bytes) {
         mesDig.update(bytes);
 
         return this;
     }
 
-    public ShaSum update(byte[] bytes, int i, int i1) {
+    public Sha160Sum update(byte[] bytes, int i, int i1) {
         while (i < i1)
             mesDig.update(bytes[i++]);
 

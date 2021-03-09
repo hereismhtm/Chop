@@ -1,15 +1,15 @@
 package compress.disk;
 
 import compress.CompressMode;
-import helpers.ShaSum;
+import helpers.Sha160Sum;
 
 import java.io.*;
 
 public class DataManager {
     public static CompressMode compressMode;
     public boolean virtualWriterMode;
-    public final ShaSum inputShaSum = new ShaSum();
-    public final ShaSum outputShaSum = new ShaSum();
+    public final Sha160Sum inputSha160Sum = new Sha160Sum();
+    public final Sha160Sum outputSha160Sum = new Sha160Sum();
 
     private static Cache cache = null;
     private FileInputStream fileInputStream;
@@ -136,11 +136,11 @@ public class DataManager {
             FileOutputStream fOut = new FileOutputStream(result);
 
             fOut.write(header);
-            outputShaSum.update(header);
+            outputSha160Sum.update(header);
             int readBytes;
             while ((readBytes = fIn.read(cache.inBuffer)) != -1) {
                 fOut.write(cache.inBuffer, 0, readBytes);
-                outputShaSum.update(cache.inBuffer, 0, readBytes);
+                outputSha160Sum.update(cache.inBuffer, 0, readBytes);
             }
 
             fIn.close();
@@ -171,7 +171,7 @@ public class DataManager {
                 if (cache.inBytes != -1) {
                     cache.block[cache.blockMark] = cache.inBuffer[cache.inMark++];
                     if (virtualWriterMode) {
-                        inputShaSum.update(cache.inBuffer, 0, cache.inBytes);
+                        inputSha160Sum.update(cache.inBuffer, 0, cache.inBytes);
                     }
                 } else break;
             }

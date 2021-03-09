@@ -58,15 +58,15 @@ public class Chop {
                         System.out.print("new smaller size: " + bestCompressedSize + " bytes \u2764 ");
                         System.out.println(readableSize(bestCompressedSize));
                         System.out.println("compress efficiency: " + outputEffAgainst(headerBuilder.originalSize));
-                        System.out.println("sha1 fingerprint: " + dm.outputShaSum.digest());
+                        System.out.println("sha1 fingerprint: " + dm.outputSha160Sum.digest());
                     } else {
                         System.out.println("\n(ಥ﹏ಥ) PROCESS FAILED!");
                     }
 
                     System.out.println("total rounds: " + round);
                     System.out.print("process time: ");
-                    long minutes = stopWatch.getTimeMins();
-                    long seconds = stopWatch.getTimeSecs();
+                    long minutes = stopWatch.getTimeMinutes();
+                    long seconds = stopWatch.getTimeSeconds();
                     seconds = seconds - (minutes * 60);
                     System.out.print(minutes + " minute and ");
                     System.out.println(seconds + " second");
@@ -140,7 +140,7 @@ public class Chop {
         dm.virtualWriterMode = true;
         fullPassIndexer(matrixBlocks);
         if (round == 1) {
-            headerBuilder.fingerprint = dm.inputShaSum.digest();
+            headerBuilder.fingerprint = dm.inputSha160Sum.digest();
         }
         long nextCompressedSize = dm.getSourceSize()
                 - domination

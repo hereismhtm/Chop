@@ -1,4 +1,4 @@
-import helpers.ShaSum;
+import helpers.Sha160Sum;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -6,7 +6,7 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 
 public class XChop {
-    static ShaSum shaSum = new ShaSum();
+    static Sha160Sum sha160Sum = new Sha160Sum();
     static final byte[] inBuffer = new byte[268435456];
     static final byte[] outBuffer = new byte[268435456];
     static int inBytes;
@@ -55,7 +55,7 @@ public class XChop {
                         System.out.print("extracted data size: " + extractedSize + " bytes \u2764 ");
                         System.out.println(readableSize(extractedSize));
                         System.out.println("data origination: " + dataOrigination());
-                        System.out.println("sha1 fingerprint: " + shaSum.digest());
+                        System.out.println("sha1 fingerprint: " + sha160Sum.digest());
                     } else {
                         System.out.println("\n(ಥ﹏ಥ) PROCESS FAILED!");
                     }
@@ -191,7 +191,7 @@ public class XChop {
             } while (inMark != -1);
             if (outMark > 0) {
                 fileOutputStream.write(outBuffer, 0, outMark);
-                if (isLastRound) shaSum.update(outBuffer, 0, outMark);
+                if (isLastRound) sha160Sum.update(outBuffer, 0, outMark);
                 extractedSize += outMark;
                 outMark = 0;
             }
@@ -208,7 +208,7 @@ public class XChop {
         if (round != 1 && !input.delete()) {
             return false;
         } else if (isLastRound) {
-            if (extractedSize == originalSize && shaSum.digest().equals(fingerprint)) {
+            if (extractedSize == originalSize && sha160Sum.digest().equals(fingerprint)) {
                 return roundFile.renameTo(output);
             } else {
 //                roundFile.delete();
@@ -223,7 +223,7 @@ public class XChop {
         outBuffer[outMark++] = b;
         if (outMark == outBuffer.length) {
             fileOutputStream.write(outBuffer);
-            if (isLastRound) shaSum.update(outBuffer);
+            if (isLastRound) sha160Sum.update(outBuffer);
             extractedSize += outBuffer.length;
             outMark = 0;
         }
